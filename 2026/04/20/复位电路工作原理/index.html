@@ -17,24 +17,33 @@
   <!-- PACE Progress Bar START -->
 
   
-  <title>关于 | Lu’s tech blogs</title>
+  <title>复位电路工作原理 | Lu’s tech blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+  <meta name="keywords" content="单片机复位电路" />
   
   
   
-  <meta name="description" content="分享嵌入式相关技术内容">
-<meta property="og:type" content="website">
-<meta property="og:title" content="about">
-<meta property="og:url" content="http://example.com/about/index.html">
+  
+  <meta name="description" content="MCU的复位单片机上一般会有一个引脚。这个引脚可以感知外部网络传过来的是高电平还是低电平。然后根据MCU的内部设计，数据手册可能会告知用户。默认情况下，你给这个引脚低电平，MCU就会正常执行代码。如果你给了他高电平一定时间。它就会清除掉目前所有的状态，重新从代码的第一行开始执行。下面举例说明（针对于STC89C52RC）： 复位电路的工作原理（1）在上电的瞬间，电容处于充电状态，此时电容相当于一根">
+<meta property="og:type" content="article">
+<meta property="og:title" content="复位电路工作原理">
+<meta property="og:url" content="http://example.com/2026/04/20/%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="Lu’s tech blogs">
-<meta property="og:description" content="分享嵌入式相关技术内容">
+<meta property="og:description" content="MCU的复位单片机上一般会有一个引脚。这个引脚可以感知外部网络传过来的是高电平还是低电平。然后根据MCU的内部设计，数据手册可能会告知用户。默认情况下，你给这个引脚低电平，MCU就会正常执行代码。如果你给了他高电平一定时间。它就会清除掉目前所有的状态，重新从代码的第一行开始执行。下面举例说明（针对于STC89C52RC）： 复位电路的工作原理（1）在上电的瞬间，电容处于充电状态，此时电容相当于一根">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-04-19T05:42:44.000Z">
-<meta property="article:modified_time" content="2026-04-19T05:42:44.660Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420190214348.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420190235270.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420185829340.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420191047302.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420191139957.png">
+<meta property="article:published_time" content="2026-04-20T11:35:25.000Z">
+<meta property="article:modified_time" content="2026-04-20T11:57:14.299Z">
 <meta property="article:author" content="Lu">
-<meta property="article:tag" content="技术博客，嵌入式开发，c&#x2F;c++">
+<meta property="article:tag" content="单片机">
+<meta property="article:tag" content="复位电路">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420190214348.png">
   
     <link rel="alternate" href="/atom.xml" title="Lu’s tech blogs" type="application/atom+xml">
   
@@ -98,7 +107,7 @@ var themeMenus = {};
 </script>
 
 
-  <body>
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
 
 
   <header id="allheader" class="site-header" role="banner">
@@ -176,7 +185,7 @@ var themeMenus = {};
             
       <div id="content" class="outer">
         
-          <section id="main"><article id="page-"  class="article article-type-page" itemscope itemprop="blogPost" >
+          <section id="main" style="float:none;"><article id="post-复位电路工作原理" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
     
     
@@ -184,7 +193,7 @@ var themeMenus = {};
         
   
     <h1 class="thumb" class="article-title" itemprop="name">
-      about
+      复位电路工作原理
     </h1>
   
 
@@ -192,6 +201,10 @@ var themeMenus = {};
     
     <div class="article-meta">
       
+	Posted on <a href="/2026/04/20/%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" class="article-date">
+	  <time datetime="2026-04-20T11:35:25.000Z" itemprop="datePublished">四月 20, 2026</time>
+	</a>
+
       
 	<span id="busuanzi_container_page_pv">
 	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
@@ -200,12 +213,44 @@ var themeMenus = {};
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h1 id="MCU的复位"><a href="#MCU的复位" class="headerlink" title="MCU的复位"></a>MCU的复位</h1><p>单片机上一般会有一个引脚。这个引脚可以感知外部网络传过来的是高电平还是低电平。然后根据MCU的内部设计，数据手册可能会告知用户。默认情况下，你给这个引脚低电平，MCU就会正常执行代码。如果你给了他高电平一定时间。它就会清除掉目前所有的状态，重新从代码的第一行开始执行。下面举例说明（针对于STC89C52RC）：</p>
+<h1 id="复位电路的工作原理"><a href="#复位电路的工作原理" class="headerlink" title="复位电路的工作原理"></a>复位电路的工作原理</h1><p>（1）在上电的瞬间，电容处于充电状态，此时电容<strong>相当于一根导线</strong>，并没有起到隔断作用，因此RST 引脚会直接获得<strong>高电平</strong>，产生上电复位的现象。</p>
+<p><img src="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420190214348.png" alt="image-20260420190214348"></p>
+<p>（2）在上电一段时间后，电容完成充电，此时电容<strong>相当于断路</strong>，且开关断开，RST 引脚被下拉为<strong>低电平</strong>，MCU 开始正常运行代码。</p>
+<p><img src="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420190235270.png" alt="image-20260420190235270"></p>
+<p>（3）按下开关后，RST 引脚<strong>相当于直接连接到 VCC</strong>，此时 RST 引脚变为<strong>高电平</strong>。这个高电平状态会维持几十微秒，MCU 检测到后就会<strong>清空当前运行状态</strong>，重新回到程序的第一行代码开始执行。电路的巧妙之处在于，按下开关后，充满电的电容C1开始放电，放完电后又被VCC充电，均使得RST引脚的高电平有效时长被拉长。</p>
+<p><img src="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420185829340.png" alt="image-20260420185829340"></p>
+<hr>
+<h1 id="电容的作用"><a href="#电容的作用" class="headerlink" title="电容的作用"></a>电容的作用</h1><p>这个电容的主要作用是<strong>保证 RST 引脚获得充足的高电平维持时间</strong>。</p>
+<ul>
+<li>电容的容量越大，所需的<strong>充电时间就越长</strong>，高电平维持的时间也越长。</li>
+<li>电容的容量越小，充电时间越短，高电平维持时间也相应变短。</li>
+</ul>
+<blockquote>
+<p><strong>示例说明：</strong></p>
+<ul>
+<li><p>使用 <strong>10μF 电容</strong>时，按键按下后的高电平维持时间相对较短。</p>
+<p><img src="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420191047302.png" alt="image-20260420191047302"></p>
+</li>
+<li><p>使用 <strong>50μF 电容</strong>时，按键按下后的高电平维持时间会更长</p>
+<p><img src="https://raw.githubusercontent.com/GLuuuuu/my_blog_img/main/image-20260420191139957.png" alt="image-20260420191139957"></p>
+</li>
+</ul>
+</blockquote>
+<p>通常情况下，单片机的复位引脚（RST）需要<strong>一个持续一定时间长度的高电平信号</strong>才能识别并执行复位操作。</p>
+<p>通过<strong>调整复位电路中的电容值</strong>，我们可以确保每次按下复位按钮时，都能提供<strong>足够长的高电平信号</strong>，从而保证单片机能够<strong>稳定可靠地触发复位</strong>。</p>
+
       
     </div>
     <footer class="entry-meta entry-footer">
       
+	<span class="ico-folder"></span>
+    <a class="article-category-link" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/">嵌入式</a>
+
       
+  <span class="ico-tags"></span>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" rel="tag">单片机</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF/" rel="tag">复位电路</a></li></ul>
+
       
         <div id="donation_div"></div>
 
@@ -252,199 +297,30 @@ var a = new Donate({
   </div>
   
     
+<nav id="article-nav">
+  
+  
+    <a href="/2026/04/19/%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">博客搭建与部署</div>
+    </a>
+  
+</nav>
+
   
 </article>
 
 <!-- Table of Contents -->
 
+  <aside id="sidebar">
+    <div id="toc" class="toc-article" style="overflow-y: scroll; max-width: 28%;">
+    <strong class="toc-title">文章目录</strong>
     
+      <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MCU%E7%9A%84%E5%A4%8D%E4%BD%8D"><span class="nav-number">1.</span> <span class="nav-text">MCU的复位</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">复位电路的工作原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%B5%E5%AE%B9%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">电容的作用</span></a></li></ol>
+    
+    </div>
+  </aside>
 </section>
-          <aside id="sidebar">
-  
-    <div class="widget-wrap" style="margin: 20px 0;">
-	<div id="search-form-wrap">
-
-    <form class="search-form">
-        <label style="width: 75%;">
-            <span class="screen-reader-text">Search for:</span>
-            <input type="search" class="search-field" style="height: 42px;" placeholder=" 搜索…" value="" name="s" title="Search for:">
-        </label>
-        <input type="submit" class="search-form-submit" value="搜索">
-    </form>
-    <div class="ins-search">
-    <div class="ins-search-mask"></div>
-    <div class="ins-search-container">
-        <div class="ins-input-wrapper">
-            <input type="text" class="ins-search-input" placeholder="请输入关键词..."/>
-            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
-        </div>
-        <div class="ins-section-wrapper">
-            <div class="ins-section-container"></div>
-        </div>
-    </div>
-</div>
-<script>
-(function (window) {
-    var INSIGHT_CONFIG = {
-        TRANSLATION: {
-            POSTS: '文章',
-            PAGES: '页面',
-            CATEGORIES: '分类',
-            TAGS: '标签',
-            UNTITLED: '(无标题)',
-        },
-        ROOT_URL: '/',
-        CONTENT_URL: '/content.json',
-    };
-    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
-})(window);
-</script>
-
-<script src="/js/insight.js"></script>
-
-
-</div>
-</div>
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">联系我们</h3>
-    <div class="widget widget_athemes_social_icons">
-
-    	<ul class="clearfix widget-social-icons">   
-    	
-          
-     			  <li><a target="_blank" rel="noopener" href="https://github.com/iTimeTraveler" title="Github"><i class="fa fa-github" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-     			  <li><a target="_blank" rel="noopener" href="http://www.yoursite.com" title="Weibo"><i class="fa fa-weibo" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-     			  <li><a href="" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-     			  <li><a href="" title="Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-     			  <li><a href="" title="Google-plus"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-     			  <li><a href="" title="Instagram"><i class="fa fa-instagram" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-     			  <li><a href="" title="Pinterest"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-     			  <li><a href="" title="Flickr"><i class="fa fa-flickr" aria-hidden="true"></i></a></li> 
-          
-   		
-          
-            <li><a href="mailto:?subject=请联系我&body=我能帮你什么" title="email"><i class="fa fa-envelope" aria-hidden="true"></i></a></li> 
-          
-   		
-   		</ul>
-
-
-   		<!--
-   		<ul class="clearfix widget-social-icons">   		
-   		<li class="widget-si-twitter"><a target="_blank" rel="noopener" href="http://twitter.com" title="Twitter"><i class="ico-twitter"></i></a></li> 
-		<li class="widget-si-facebook"><a target="_blank" rel="noopener" href="http://facebook.com" title="Facebook"><i class="ico-facebook"></i></a></li>
-			<li class="widget-si-gplus"><a target="_blank" rel="noopener" href="http://plus.google.com" title="Google+"><i class="ico-gplus"></i></a></li>
-			<li class="widget-si-pinterest"><a target="_blank" rel="noopener" href="http://pinterest.com" title="Pinterest"><i class="ico-pinterest"></i></a></li>
-			<li class="widget-si-flickr"><a target="_blank" rel="noopener" href="http://flickr.com" title="Flickr"><i class="ico-flickr"></i></a></li>
-			<li class="widget-si-instagram"><a target="_blank" rel="noopener" href="http://instagram.com" title="Instagram"><i class="ico-instagram"></i></a></li>
-		</ul> -->
-
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget_athemes_tabs">
-    <ul id="widget-tab" class="clearfix widget-tab-nav">
-      <li class="active"><a>最新文章</a></li>
-    </ul>
-    <div class="widget">
-      <ul>
-        
-          <li class="clearfix">
-
-            
-              <div class="widget-entry-summary" style="margin: 0;">
-            
-
-              <h6 style="margin: 0;"><a href="/2026/04/20/%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/">复位电路工作原理</a></h6>
-              <span>四月 20, 2026</span>
-            </div>
-
-          </li>
-        
-          <li class="clearfix">
-
-            
-              <div class="widget-entry-summary" style="margin: 0;">
-            
-
-              <h6 style="margin: 0;"><a href="/2026/04/19/%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/">博客搭建与部署</a></h6>
-              <span>四月 19, 2026</span>
-            </div>
-
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE/">博客配置</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/">嵌入式</a><span class="category-list-count">1</span></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" rel="tag">单片机</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF/" rel="tag">复位电路</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" rel="tag">学习记录</a><span class="tag-list-count">1</span></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" style="font-size: 10px;">单片机</a> <a href="/tags/%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF/" style="font-size: 10px;">复位电路</a> <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" style="font-size: 10px;">学习记录</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/04/">四月 2026</a><span class="archive-list-count">2</span></li></ul>
-    </div>
-  </div>
-
-
-  
-</aside>
         
       </div>
       <footer id="footer" class="site-footer">
