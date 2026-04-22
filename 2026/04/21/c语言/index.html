@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Core"><title>volatile 与 aligned( ) · Lu’s tech blogs</title><meta name="description" content="一、volatile 的底层原理1. 使用原因：编译器优化现代编译器会做激进优化来提高程序运行速度。例如：
+1234// 原始 C 代码int *p = (int *)0x12345678;  // 指向硬件寄存器int a = *p;int b = *p;
+
+编译器理解：”p 指向的内存没有被修改"><meta name="keywords" content="极限博客,极限Blog,博客,极限"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="/images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">Lu’s tech blogs</a></h3><div class="description"><p>心之所愿，无事不成。<br> Nothing is impossible to a willing heart.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/mrcore"><i class="fa fa-github"></i></a></li><li><a href="mailto:x@jixian.io"><i class="fa fa-envelope"></i></a></li><li><a target="_blank" rel="noopener" href="http://sighttp.qq.com/authd?IDKEY="><i class="fa fa-qq"></i></a></li><li><a target="_blank" rel="noopener" href="https://zhihu.com/people/"><i class="fa fa-mortar-board"></i></a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2020 </span><i class="fa fa-star"></i><span> Core</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/mrcore/hexo-theme-Anatole-Core" target="_blank">Anatole-Core  </a></div><div class="beian"><a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备15011643号</a><span style="height:10px;margin-left: 10px;">|</span><img src="/images/gongan.png" style="height:10px;margin-left: 10px;position: relative;top: 1px;"><span style="margin-left: 2px;">粤公网安备 44030402003967号</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/tags">标签</a></li><li><a href="/about">关于</a></li><li><a href="/guestbook">留言</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>volatile 与 aligned( )</a></h3></div><div class="post-content"><hr>
+<h2 id="一、volatile-的底层原理"><a href="#一、volatile-的底层原理" class="headerlink" title="一、volatile 的底层原理"></a>一、<code>volatile</code> 的底层原理</h2><h3 id="1-使用原因：编译器优化"><a href="#1-使用原因：编译器优化" class="headerlink" title="1. 使用原因：编译器优化"></a>1. 使用原因：编译器优化</h3><p>现代编译器会做<strong>激进优化</strong>来提高程序运行速度。例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 原始 C 代码</span></span><br><span class="line"><span class="type">int</span> *p = (<span class="type">int</span> *)<span class="number">0x12345678</span>;  <span class="comment">// 指向硬件寄存器</span></span><br><span class="line"><span class="type">int</span> a = *p;</span><br><span class="line"><span class="type">int</span> b = *p;</span><br></pre></td></tr></table></figure>
+
+<p>编译器理解：”<code>p</code> 指向的内存没有被修改过，为什么要读两次？”，结果第二次使用的仍为第一次结果，实际想要的并不是这样。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 编译器的优化结果</span><br><span class="line">LOAD R1, [0x12345678]   # 只读一次</span><br><span class="line">MOV a, R1</span><br><span class="line">MOV b, R1               # b 直接用 R1 的值</span><br></pre></td></tr></table></figure>
+
+<p><strong>问题</strong>：如果 <code>0x12345678</code> 是硬件 FIFO，第一次读取后 FIFO （队列的感觉）会自动弹出下一个数据，第二次读取应该是<strong>不同的值</strong>（即新弹出的数据）。编译器的优化破坏了程序逻辑。</p>
+<h3 id="2-加上volatile-后的汇编层面"><a href="#2-加上volatile-后的汇编层面" class="headerlink" title="2. 加上volatile 后的汇编层面"></a>2. 加上<code>volatile</code> 后的汇编层面</h3><p>原c代码保持不变，加上 <code>volatile</code> 后，编译器<strong>强制生成两次读指令</strong>，此时符合程序逻辑：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># volatile 的汇编结果</span><br><span class="line">LOAD R1, [0x12345678]   # 第一次读</span><br><span class="line">MOV a, R1</span><br><span class="line">LOAD R1, [0x12345678]   # 第二次读</span><br><span class="line">MOV b, R1</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-真实场景举例：DMA-写入缓冲区"><a href="#3-真实场景举例：DMA-写入缓冲区" class="headerlink" title="3. 真实场景举例：DMA 写入缓冲区"></a>3. 真实场景举例：DMA 写入缓冲区</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> dma_buffer[<span class="number">512</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// CPU 轮询等待 DMA 完成</span></span><br><span class="line"><span class="keyword">while</span>(!(dma_ctrl &amp; <span class="number">0x4</span>)) &#123;</span><br><span class="line">    <span class="comment">// 空循环</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取 DMA 写入的数据</span></span><br><span class="line"><span class="type">int</span> data = dma_buffer[<span class="number">0</span>];</span><br></pre></td></tr></table></figure>
+
+<p><strong>没有 <code>volatile</code> 的后果</strong>：</p>
+<p>CPU 可能从 <strong>Cache</strong> 读数据（认为数据未被修改），而 DMA 直接写 <strong>DRAM</strong>（CPU不知道），造成 <strong>Cache 不一致</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 编译器优化后</span><br><span class="line">LOAD R1, [dma_buffer]   # 只读一次，放到寄存器</span><br><span class="line"># 后续所有对地址[dma_buffer]访问都用 R1，看不到 DMA 写的新数据</span><br></pre></td></tr></table></figure>
+
+<p><strong>有 <code>volatile</code> 的效果</strong>：</p>
+<p>CPU 会<strong>绕过 Cache</strong> 或者<strong>强制刷新 Cache</strong>，从 DRAM 读取最新数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 每次都从内存地址读取</span><br><span class="line">LOAD R1, [dma_buffer]</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、-attribute-aligned-的底层原理"><a href="#二、-attribute-aligned-的底层原理" class="headerlink" title="二、__attribute__((aligned( ))) 的底层原理"></a>二、<code>__attribute__((aligned( )))</code> 的底层原理</h2><h3 id="1-内存对齐的硬件原因"><a href="#1-内存对齐的硬件原因" class="headerlink" title="1. 内存对齐的硬件原因"></a>1. 内存对齐的硬件原因</h3><p>DRAM 和 CPU 之间的数据交换不是按字节进行的，而是按<strong>总线宽度</strong>或 <strong>Cache Line</strong>。按照总线宽度交换时效率最高。如果数据跨越了<strong>两次总线传输的边界</strong>，就需要两次内存访问。</p>
+<h3 id="举例："><a href="#举例：" class="headerlink" title="举例："></a>举例：</h3><p>总线宽度为4字节如果要读取 32 位数据，起始地址是 <code>0x1001</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">目标：需要的 4 字节 = A5, A6, A7, B0</span><br><span class="line">第1步：读取块1 (0x1000-0x1003)</span><br><span class="line">┌────┬────┬────┬────┐</span><br><span class="line">│ A0 │ A1 │ A2 │ A3 │ </span><br><span class="line">┴────┴────┴────┴────┘</span><br><span class="line">        ▲    ▲    ▲</span><br><span class="line">        │    │    │</span><br><span class="line">      提取这 3 个字节 (A1, A2, A3)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">第2步：读取块2 (0x1004-0x1007)</span><br><span class="line">┌────┬────┬────┬────┐</span><br><span class="line">│ A4 │ A5 │ A6 │ A7 │</span><br><span class="line">└────┴────┴────┴────┘</span><br><span class="line">   ▲</span><br><span class="line">   └── 提取这 1 个字节 (B0)</span><br><span class="line">   </span><br><span class="line"> 第3步：拼接A1, A2, A3, A4  → 组成完整的 32 位数据</span><br></pre></td></tr></table></figure>
+
+<p><strong>CPU 必须</strong>进行两次总线传输；而对对齐后仅需一次便可拿到数据，降低了CPU访问内存的次数；</p>
+<h3 id="3-使用aligned-的内存分配"><a href="#3-使用aligned-的内存分配" class="headerlink" title="3. 使用aligned( ) 的内存分配"></a>3. 使用<code>aligned( )</code> 的内存分配</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//举例32</span></span><br><span class="line"><span class="type">int</span> <span class="built_in">array</span>[<span class="number">512</span>] __attribute__((aligned(<span class="number">32</span>)));</span><br></pre></td></tr></table></figure>
+
+<p>编译器在分配内存时：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">链接脚本分配的内存布局：</span><br><span class="line"></span><br><span class="line">0x1C080000 │ 其他变量/代码</span><br><span class="line">0x1C080004 │ </span><br><span class="line">0x1C080008 │ </span><br><span class="line">    ...</span><br><span class="line">0x1C08001C │ </span><br><span class="line">0x1C080020 │ ◄─── array[0]  </span><br><span class="line">0x1C080024 │      array[1]</span><br><span class="line">0x1C080028 │      array[2]</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">层面</th>
+<th align="left">不对齐的后果</th>
+<th align="left">对齐的好处</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>DMA 硬件</strong></td>
+<td align="left">产生总线错误，传输失败（硬件要求对齐）</td>
+<td align="left">硬件简单，传输可靠</td>
+</tr>
+<tr>
+<td align="left"><strong>DMA 性能</strong></td>
+<td align="left">需要多次总线访问</td>
+<td align="left">1 次总线访问完成</td>
+</tr>
+<tr>
+<td align="left"><strong>Cache</strong></td>
+<td align="left">跨行导致维护复杂</td>
+<td align="left">精确控制，减少开销</td>
+</tr>
+<tr>
+<td align="left"><strong>功耗</strong></td>
+<td align="left">多次访问，功耗高</td>
+<td align="left">单次访问，功耗低</td>
+</tr>
+<tr>
+<td align="left"><strong>软件复杂度</strong></td>
+<td align="left">需要处理非对齐情况（移位等）</td>
+<td align="left">直接使用，无需特殊处理</td>
+</tr>
+</tbody></table>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-04-21</span><i class="fa fa-tag"></i><a class="tag" href="/categories/c-c/" title="c/c++">c/c++ </a><a class="tag" href="/tags/c语言/" title="c语言">c语言 </a><span class="leancloud_visitors"></span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://example.com/2026/04/21/c语言/,Lu’s tech blogs,volatile 与 aligned( ),;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="/2026/04/20/%E5%A4%8D%E4%BD%8D%E7%94%B5%E8%B7%AF%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" title="复位电路工作原理">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="vcomments" style="margin:0 30px;"></div><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="//cdn.jsdelivr.net/gh/xcss/valine@latest/dist/Valine.min.js"></script><script>var valine = new Valine({
+  el:'#vcomments',
+  notify:false || false, 
+  verify:false|| false, 
+  app_id:'',
+  app_key:'',
+  placeholder:'念念不忘，必有回响...',
+  path: window.location.pathname,
+  serverURLs: '',
+  visitor:true,
+  recordIP:true,
+  avatar:'mp'
+})</script></div></div></div></div><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script src="/js/baidu-tongji.js"></script></body></html>
