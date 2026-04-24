@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Core"><title>VADDR.PADDR与缓存虚拟地址 · Lumo's blogs</title><meta name="description" content="CPU 访问外设
+必须使用虚拟地址 (VADDR)
+原因：CPU 通过 MMU 发出访问，需要经过地址转换视窗
+
+DMA 控制器访问内存&amp;#x2F;外设
+必须使用物理地址 (PADDR)
+原因：DMA 是独立于 CPU 的总线主设备，直接操作 AXI 总线，不经过 MMU
+
+正确示例12345678"><meta name="keywords" content="极限博客,极限Blog,博客,极限"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="/images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">Lumo's blogs</a></h3><div class="description"><p>心之所愿，无事不成。<br> Nothing is impossible to a willing heart.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Gluuuuu"><i class="fa fa-github"></i></a></li><li><a href="suus9809@gmail.com"><i class="fa fa-envelope"></i></a></li><li><a target="_blank" rel="noopener" href="http://sighttp.qq.com/authd?IDKEY="><i class="fa fa-qq"></i></a></li><li><a target="_blank" rel="noopener" href="https://zhihu.com/people/"><i class="fa fa-mortar-board"></i></a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2020 </span><i class="fa fa-star"></i><span> Core</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/mrcore/hexo-theme-Anatole-Core" target="_blank">Anatole-Core  </a></div><div class="beian"><a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备15011643号</a><span style="height:10px;margin-left: 10px;">|</span><img src="/images/gongan.png" style="height:10px;margin-left: 10px;position: relative;top: 1px;"><span style="margin-left: 2px;">粤公网安备 44030402003967号</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/tags">标签</a></li><li><a href="/about">关于</a></li><li><a href="/guestbook">留言</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>VADDR.PADDR与缓存虚拟地址</a></h3></div><div class="post-content"><hr>
+<h3 id="CPU-访问外设"><a href="#CPU-访问外设" class="headerlink" title="CPU 访问外设"></a>CPU 访问外设</h3><ul>
+<li><strong>必须使用虚拟地址 (VADDR)</strong></li>
+<li>原因：CPU 通过 MMU 发出访问，需要经过地址转换视窗</li>
+</ul>
+<h3 id="DMA-控制器访问内存-外设"><a href="#DMA-控制器访问内存-外设" class="headerlink" title="DMA 控制器访问内存&#x2F;外设"></a>DMA 控制器访问内存&#x2F;外设</h3><ul>
+<li><strong>必须使用物理地址 (PADDR)</strong></li>
+<li>原因：DMA 是独立于 CPU 的总线主设备，直接操作 AXI 总线，不经过 MMU</li>
+</ul>
+<h3 id="正确示例"><a href="#正确示例" class="headerlink" title="正确示例"></a>正确示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DMA 源地址：内存缓冲区（物理地址）</span></span><br><span class="line">RegWrite(DMA_SADDR_VADDR, (<span class="type">unsigned</span> <span class="type">int</span>)buffer_phys);</span><br><span class="line"></span><br><span class="line"><span class="comment">// DMA 目标地址：外设数据寄存器（物理地址）</span></span><br><span class="line">RegWrite(DMA_DADDR_VADDR, AXI_FFT_DATA_IN_PADDR);  <span class="comment">//  正确，使用 PADDR</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// CPU 轮询读取结果（虚拟地址）</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> result = *(<span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *)AXI_FFT_DATA_OUT_VADDR;  <span class="comment">//  正确，使用 VADDR</span></span><br></pre></td></tr></table></figure>
+
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>使用地址类型</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CPU 读写外设寄存器</td>
+<td>非缓存虚拟地址 (VADDR)</td>
+<td><code>0xbf401000</code></td>
+</tr>
+<tr>
+<td>CPU 读写内存（普通变量）</td>
+<td>缓存虚拟地址</td>
+<td><code>0x80000000</code></td>
+</tr>
+<tr>
+<td>DMA 配置源&#x2F;目标地址</td>
+<td>物理地址 (PADDR)</td>
+<td><code>0x1f401000</code></td>
+</tr>
+</tbody></table>
+<h3 id="非缓存虚拟地址-VADDR-——-CPU-访问外设"><a href="#非缓存虚拟地址-VADDR-——-CPU-访问外设" class="headerlink" title="非缓存虚拟地址 (VADDR) —— CPU 访问外设"></a>非缓存虚拟地址 (VADDR) —— CPU 访问外设</h3><ul>
+<li><strong>本质</strong>：CPU 视角的“直通窗口”。地址高位的特殊标记（如 <code>0xbf...</code>）告诉 CPU 的 MMU（内存管理单元）：“不要缓存这次读写，直接发到总线上”。</li>
+<li><strong>特点</strong>：<strong>绕过 Cache</strong>，每次访问都直接产生 AXI 总线事务。因此访问外设寄存器（如 FFT 控制、UART 状态）或需要实时性、无缓冲的数据时必须用它。</li>
+<li><strong>总结：</strong>CPU 查看硬件状态的实时快照，即“专用通道”**。</li>
+</ul>
+<h3 id="缓存虚拟地址-——-CPU-访问普通内存"><a href="#缓存虚拟地址-——-CPU-访问普通内存" class="headerlink" title="缓存虚拟地址                      —— CPU 访问普通内存"></a>缓存虚拟地址                      —— CPU 访问普通内存</h3><ul>
+<li><strong>本质</strong>：CPU 读写内存（如 <code>0x80000000</code> 的 DDR）时的默认路径。数据先暂存在 CPU 内部的 Cache 中，稍后再批量写回内存，或从 Cache 中快速读取。</li>
+<li><strong>特点</strong>：<strong>利用 Cache 加速</strong>，读写极快，但结果与总线不同步（有延迟）。这是 CPU 执行代码、操作堆栈、处理数据的标准方式。</li>
+<li><strong>总结：</strong>CPU 日常工作的“高速缓存”，与外界（总线）有时差**。</li>
+</ul>
+<h3 id="物理地址-PADDR-——-DMA-访问内存-外设"><a href="#物理地址-PADDR-——-DMA-访问内存-外设" class="headerlink" title="物理地址 (PADDR)            —— DMA 访问内存&#x2F;外设"></a>物理地址 (PADDR)            —— DMA 访问内存&#x2F;外设</h3><ul>
+<li><strong>本质</strong>：<strong>总线上的真实地址</strong>。没有 MMU 转换，没有 Cache 干预，直接对应内存或外设的物理位置。</li>
+<li><strong>特点</strong>：<strong>DMA 控制器（或其他总线主设备）使用它来搬运数据</strong>。因为它不经过 CPU 的 MMU 和 Cache，所以能准确找到内存中的变量或外设的数据端口。</li>
+</ul>
+<p><strong>缓存虚拟地址是”允许使用 Cache 的普通虚拟地址”。Cache 是硬件自动管理的加速层，对软件透明，不可直接寻址。</strong></p>
+<hr>
+<h3 id="三种地址的关系"><a href="#三种地址的关系" class="headerlink" title="三种地址的关系"></a>三种地址的关系</h3><table>
+<thead>
+<tr>
+<th>地址类型</th>
+<th>本质</th>
+<th>比喻</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>物理地址 (PADDR)</strong></td>
+<td>总线上的真实坐标</td>
+<td>房屋的<strong>GPS坐标</strong></td>
+</tr>
+<tr>
+<td><strong>缓存虚拟地址</strong></td>
+<td>经过MMU转换 + 允许Cache</td>
+<td>写<strong>收件地址</strong>，快递员可暂存快递柜</td>
+</tr>
+<tr>
+<td><strong>非缓存虚拟地址</strong></td>
+<td>经过MMU转换 + 禁止Cache</td>
+<td>写<strong>收件地址</strong>，但必须当面签收</td>
+</tr>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CPU 发出虚拟地址</span><br><span class="line">     ↓</span><br><span class="line">MMU 转换为物理地址</span><br><span class="line">     ↓</span><br><span class="line">根据地址属性决定:</span><br><span class="line">- 缓存属性=允许 → 先查Cache，未命中再访问内存</span><br><span class="line">- 缓存属性=禁止 → 直接访问内存/外设</span><br></pre></td></tr></table></figure>
+
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-04-24</span><i class="fa fa-tag"></i><a class="tag" href="/categories/FPGA/" title="FPGA">FPGA </a><a class="tag" href="/categories/FPGA/SoC/" title="SoC">SoC </a><a class="tag" href="/tags/软件测试/" title="软件测试">软件测试 </a><span class="leancloud_visitors"></span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://example.com/2026/04/24/CPU与DMA地址访问/,Lumo's blogs,VADDR.PADDR与缓存虚拟地址,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="/2026/04/23/LCD%E6%AD%A3%E7%A1%AE%E6%98%BE%E7%A4%BA%E6%B1%89%E5%AD%97/" title="LCD显示汉字乱码问题">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="vcomments" style="margin:0 30px;"></div><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="//cdn.jsdelivr.net/gh/xcss/valine@latest/dist/Valine.min.js"></script><script>var valine = new Valine({
+  el:'#vcomments',
+  notify:false || false, 
+  verify:false|| false, 
+  app_id:'',
+  app_key:'',
+  placeholder:'念念不忘，必有回响...',
+  path: window.location.pathname,
+  serverURLs: '',
+  visitor:true,
+  recordIP:true,
+  avatar:'mp'
+})</script></div></div></div></div><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script src="/js/baidu-tongji.js"></script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":200,"height":400,"hOffset":5,"vOffset":-38},"mobile":{"show":false,"scale":0.2},"react":{"opacityDefault":0.8,"opacityOnHover":0.2},"log":false});</script></body></html>
