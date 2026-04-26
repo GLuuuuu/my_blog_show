@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Core"><title>keil项目结构与工程配置 · Lumo's blogs</title><meta name="description" content="keil项目的整体结构说明：1234567891011121314151617181920Project/│├── app/                        # 应用层代码│   └── (用户应用逻辑、主流程控制等)│├── driver/                     #"><meta name="keywords" content="极限博客,极限Blog,博客,极限"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="/images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">Lumo's blogs</a></h3><div class="description"><p>心之所愿，无事不成。<br> Nothing is impossible to a willing heart.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Gluuuuu"><i class="fa fa-github"></i></a></li><li><a href="suus9809@gmail.com"><i class="fa fa-envelope"></i></a></li><li><a target="_blank" rel="noopener" href="http://sighttp.qq.com/authd?IDKEY="><i class="fa fa-qq"></i></a></li><li><a target="_blank" rel="noopener" href="https://zhihu.com/people/"><i class="fa fa-mortar-board"></i></a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2020 </span><i class="fa fa-star"></i><span> Core</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/mrcore/hexo-theme-Anatole-Core" target="_blank">Anatole-Core  </a></div><div class="beian"><a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备15011643号</a><span style="height:10px;margin-left: 10px;">|</span><img src="/images/gongan.png" style="height:10px;margin-left: 10px;position: relative;top: 1px;"><span style="margin-left: 2px;">粤公网安备 44030402003967号</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/tags">标签</a></li><li><a href="/about">关于</a></li><li><a href="/guestbook">留言</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>keil项目结构与工程配置</a></h3></div><div class="post-content"><h1 id="keil项目的整体结构说明："><a href="#keil项目的整体结构说明：" class="headerlink" title="keil项目的整体结构说明："></a>keil项目的整体结构说明：</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Project/</span><br><span class="line">│</span><br><span class="line">├── app/                        # 应用层代码</span><br><span class="line">│   └── (用户应用逻辑、主流程控制等)</span><br><span class="line">│</span><br><span class="line">├── driver/                     # 硬件驱动层（板级驱动）</span><br><span class="line">│   └── (外设驱动：LED、按键、传感器等)</span><br><span class="line">│</span><br><span class="line">├── framework/                  # 固件框架层</span><br><span class="line">│   ├── cmsis/                  # CMSIS 核心（ARM内核抽象层）</span><br><span class="line">│   │   └── (Core Peripheral Access Layer、内核相关文件)</span><br><span class="line">│   │</span><br><span class="line">│   └── driver/                 # STD库驱动层（芯片外设驱动）</span><br><span class="line">│       └── (STM32标准外设库：GPIO、USART、RCC等)</span><br><span class="line">│</span><br><span class="line">├── mdk/                        # Keil工程文件目录</span><br><span class="line">│   └── (.uvprojx工程文件、编译生成文件等)</span><br><span class="line">│</span><br><span class="line">└── third_lib/                  # 第三方库</span><br><span class="line">    └── (RTOS、中间件、算法库等)</span><br></pre></td></tr></table></figure>
+
+<h2 id="分层说明"><a href="#分层说明" class="headerlink" title="分层说明"></a>分层说明</h2><table>
+<thead>
+<tr>
+<th>目录</th>
+<th>作用</th>
+<th>依赖关系</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>app</strong></td>
+<td>用户应用逻辑</td>
+<td>调用 driver、framework</td>
+</tr>
+<tr>
+<td><strong>driver</strong></td>
+<td>板级硬件封装</td>
+<td>调用 framework&#x2F;driver</td>
+</tr>
+<tr>
+<td><strong>framework</strong></td>
+<td>芯片底层支持</td>
+<td>独立，被上层调用</td>
+</tr>
+<tr>
+<td><strong>mdk</strong></td>
+<td>工程管理</td>
+<td>链接所有源码</td>
+</tr>
+<tr>
+<td><strong>third_lib</strong></td>
+<td>外部扩展功能</td>
+<td>被 app 调用</td>
+</tr>
+</tbody></table>
+<h2 id="典型调用链（GPIO为例）"><a href="#典型调用链（GPIO为例）" class="headerlink" title="典型调用链（GPIO为例）"></a>典型调用链（GPIO为例）</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">app/main.c </span><br><span class="line">    ↓ 调用</span><br><span class="line">driver/led.c </span><br><span class="line">    ↓ 调用</span><br><span class="line">framework/driver/stm32f10x_gpio.c </span><br><span class="line">    ↓ 底层操作</span><br><span class="line">framework/cmsis/ (寄存器定义)</span><br></pre></td></tr></table></figure>
+
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul>
+<li><code>framework</code> 下有两个 <code>driver</code> 文件夹，但作用不同：<ul>
+<li><code>framework/driver</code>：STD库的芯片外设驱动（与硬件无关）</li>
+<li><code>driver/</code>：自己封装的板级驱动（与具体硬件相关）</li>
+</ul>
+</li>
+</ul>
+<h1 id="工程配置注意事项"><a href="#工程配置注意事项" class="headerlink" title="工程配置注意事项"></a>工程配置注意事项</h1><h2 id="1-ST-Link-调试配置"><a href="#1-ST-Link-调试配置" class="headerlink" title="1. ST-Link 调试配置"></a>1. ST-Link 调试配置</h2><table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>推荐设置</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Port</strong></td>
+<td><code>SWD</code></td>
+<td>使用两线调试，节省IO口</td>
+</tr>
+<tr>
+<td><strong>Clock 频率</strong></td>
+<td><code>1.8 MHz</code> 或更低</td>
+<td>过高会导致通信不稳定</td>
+</tr>
+</tbody></table>
+<p><strong>路径：</strong><br>Project → Options for Target → Debug → Settings（选中 ST-Link Debugger 后）<br>→ Port: SWD<br>→ Max Clock: 1.8 MHz</p>
+<h5 id="Flash-Download-设置"><a href="#Flash-Download-设置" class="headerlink" title="Flash Download 设置"></a>Flash Download 设置</h5><p>在同一个 Settings 窗口中，切换到 Flash Download 标签页，务必勾选：✅ Reset and Run</p>
+<p>作用：程序下载完成后自动复位芯片并运行，不需要再手动按复位键或重新上电。</p>
+<h5 id="路径："><a href="#路径：" class="headerlink" title="路径："></a>路径：</h5><p>Debug → Settings → Flash Download → Reset and Run</p>
+<h2 id="2-编译环境设置"><a href="#2-编译环境设置" class="headerlink" title="2.编译环境设置"></a>2.编译环境设置</h2><p>如果在代码中使用了 #include &lt;stdint.h&gt; 以及 uint32_t、int16_t 等类型，仍然报错 error: #254: type name is not allowed</p>
+<p>原因是 Keil 默认使用老的 C89&#x2F;C90 标准。需要开启 C99 Mode</p>
+<h5 id="路径：-1"><a href="#路径：-1" class="headerlink" title="路径："></a>路径：</h5><p>Project → Options for Target → C&#x2F;C++ → C99 Mode</p>
+<p>开启后，编译器就能正确识别 stdint.h 中的类型。</p>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2025-12-12</span><i class="fa fa-tag"></i><a class="tag" href="/categories/嵌入式/" title="嵌入式">嵌入式 </a><a class="tag" href="/tags/工程配置/" title="工程配置">工程配置 </a><a class="tag" href="/tags/项目结构/" title="项目结构">项目结构 </a><span class="leancloud_visitors"></span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://example.com/2025/12/12/工程配置与项目结构/,Lumo's blogs,keil项目结构与工程配置,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2025/12/13/%E5%91%BC%E5%90%B8%E7%81%AF/" title="呼吸灯">上一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="vcomments" style="margin:0 30px;"></div><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="//cdn.jsdelivr.net/gh/xcss/valine@latest/dist/Valine.min.js"></script><script>var valine = new Valine({
+  el:'#vcomments',
+  notify:false || false, 
+  verify:false|| false, 
+  app_id:'',
+  app_key:'',
+  placeholder:'念念不忘，必有回响...',
+  path: window.location.pathname,
+  serverURLs: '',
+  visitor:true,
+  recordIP:true,
+  avatar:'mp'
+})</script></div></div></div></div><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script src="/js/baidu-tongji.js"></script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":200,"height":400,"hOffset":5,"vOffset":-38},"mobile":{"show":false,"scale":0.2},"react":{"opacityDefault":0.8,"opacityOnHover":0.2},"log":false});</script></body></html>

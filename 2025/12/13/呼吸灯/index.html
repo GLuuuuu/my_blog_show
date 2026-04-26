@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Core"><title>呼吸灯 · Lumo's blogs</title><meta name="description" content="软件模拟PWM模拟呼吸灯效果。
+1234567891011121314151617181920212223void led_mybreathe(void)&amp;#123;	for (int32_t n = 0; n &amp;lt; 1000; n++)	&amp;#123;		for (int32_t t = 0; "><meta name="keywords" content="极限博客,极限Blog,博客,极限"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="/images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">Lumo's blogs</a></h3><div class="description"><p>心之所愿，无事不成。<br> Nothing is impossible to a willing heart.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Gluuuuu"><i class="fa fa-github"></i></a></li><li><a href="suus9809@gmail.com"><i class="fa fa-envelope"></i></a></li><li><a target="_blank" rel="noopener" href="http://sighttp.qq.com/authd?IDKEY="><i class="fa fa-qq"></i></a></li><li><a target="_blank" rel="noopener" href="https://zhihu.com/people/"><i class="fa fa-mortar-board"></i></a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2020 </span><i class="fa fa-star"></i><span> Core</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/mrcore/hexo-theme-Anatole-Core" target="_blank">Anatole-Core  </a></div><div class="beian"><a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备15011643号</a><span style="height:10px;margin-left: 10px;">|</span><img src="/images/gongan.png" style="height:10px;margin-left: 10px;position: relative;top: 1px;"><span style="margin-left: 2px;">粤公网安备 44030402003967号</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/tags">标签</a></li><li><a href="/about">关于</a></li><li><a href="/guestbook">留言</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>呼吸灯</a></h3></div><div class="post-content"><p><strong>软件模拟PWM</strong>模拟呼吸灯效果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">void led_mybreathe(void)</span><br><span class="line">&#123;</span><br><span class="line">	for (int32_t n = 0; n &lt; 1000; n++)</span><br><span class="line">	&#123;</span><br><span class="line">		for (int32_t t = 0; t &lt; 10; t++)</span><br><span class="line">		&#123;</span><br><span class="line">			for (int32_t a = 0; a &lt; n; a++)</span><br><span class="line">			led_on();</span><br><span class="line">			for (int32_t a = 1000; a &gt; n; a--)</span><br><span class="line">			led_off();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	for (int32_t n = 1000; n &gt; 0; n--)</span><br><span class="line">	&#123;</span><br><span class="line">		for (int32_t t = 0; t &lt; 10; t++)</span><br><span class="line">		&#123;</span><br><span class="line">			for (int32_t a = 0; a &lt; n; a++)</span><br><span class="line">			led_on();</span><br><span class="line">			for (int32_t a = 1000; a &gt; n; a--)</span><br><span class="line">			led_off();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="一、代码实现原理"><a href="#一、代码实现原理" class="headerlink" title="一、代码实现原理"></a>一、代码实现原理</h2><p>核心思想：<strong>通过快速切换LED的亮灭，利用人眼的视觉暂留效应，调节亮和灭的时间比例（占空比）来改变亮度。</strong></p>
+<h3 id="参数理解"><a href="#参数理解" class="headerlink" title="参数理解"></a>参数理解</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">外循环 n：控制亮度（占空比）</span><br><span class="line">    n 从 0 → 1000：亮度逐渐增加（呼吸的“吸”过程）</span><br><span class="line">    n 从 1000 → 0：亮度逐渐减小（呼吸的“呼”过程）</span><br><span class="line"></span><br><span class="line">中循环 t=0~10：每个亮度等级持续10个周期，让变化平滑</span><br><span class="line"></span><br><span class="line">内循环 a：</span><br><span class="line">    for (a=0; a&lt;n; a++) led_on();   // 亮的时间 = n 个单位</span><br><span class="line">    for (a=1000; a&gt;n; a--) led_off(); // 灭的时间 = 1000-n 个单位</span><br></pre></td></tr></table></figure>
+
+<h3 id="一个完整周期的时间分配"><a href="#一个完整周期的时间分配" class="headerlink" title="一个完整周期的时间分配"></a>一个完整周期的时间分配</h3><p>例如当 n &#x3D; 300 时：</p>
+<ul>
+<li>LED 亮：300 个空循环单位</li>
+<li>LED 灭：1000 - 300 &#x3D; 700 个空循环单位</li>
+<li>占空比 &#x3D; 300 &#x2F; 1000 &#x3D; 30%</li>
+</ul>
+<p>当 n &#x3D; 800 时：</p>
+<ul>
+<li>占空比 &#x3D; 800 &#x2F; 1000 &#x3D; 80%，LED 看起来很亮</li>
+</ul>
+<h2 id="二、类比PWM"><a href="#二、类比PWM" class="headerlink" title="二、类比PWM"></a>二、类比PWM</h2><h3 id="硬件PWM原理"><a href="#硬件PWM原理" class="headerlink" title="硬件PWM原理"></a>硬件PWM原理</h3><p>硬件PWM由定时器自动产生固定频率的方波，通过调节<strong>比较值（CCR）</strong>改变占空比：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">周期 = ARR + 1</span><br><span class="line">占空比 = CCR / (ARR + 1)</span><br></pre></td></tr></table></figure>
+
+<h3 id="软件模拟与硬件PWM的对应关系"><a href="#软件模拟与硬件PWM的对应关系" class="headerlink" title="软件模拟与硬件PWM的对应关系"></a>软件模拟与硬件PWM的对应关系</h3><table>
+<thead>
+<tr>
+<th>硬件PWM参数</th>
+<th>你的软件代码对应</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>周期（ARR）</td>
+<td>1000（固定的总数）</td>
+</tr>
+<tr>
+<td>比较值（CCR）</td>
+<td>n（亮度等级）</td>
+</tr>
+<tr>
+<td>占空比</td>
+<td>n &#x2F; 1000</td>
+</tr>
+<tr>
+<td>PWM频率</td>
+<td>1 &#x2F; (亮时间+灭时间)</td>
+</tr>
+</tbody></table>
+<h3 id="本质"><a href="#本质" class="headerlink" title="本质"></a>本质</h3><p><strong>都是用“在一个固定周期内，调整高电平（亮）的时间比例”来控制亮度</strong></p>
+<p>只是硬件PWM由定时器自动完成，不占用CPU；而软件方式用CPU空循环延时，执行期间CPU不能做其他事。</p>
+<h2 id="三、思考总结"><a href="#三、思考总结" class="headerlink" title="三、思考总结"></a>三、思考总结</h2><p>代码是<strong>纯软件的PWM模拟</strong>，通过调整亮灭的时间比例来实现呼吸效果。理解了它就可以理解了PWM的核心思想：<strong>用亮&#x2F;总时间的比例控制亮度</strong>。区别只是硬件PWM不用CPU去数循环，而是用定时器自动完成。</p>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2025-12-13</span><i class="fa fa-tag"></i><a class="tag" href="/categories/嵌入式/" title="嵌入式">嵌入式 </a><a class="tag" href="/tags/pwm/" title="pwm">pwm </a><span class="leancloud_visitors"></span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://example.com/2025/12/13/呼吸灯/,Lumo's blogs,呼吸灯,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2026/04/19/%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/" title="博客搭建与部署">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/2025/12/12/%E5%B7%A5%E7%A8%8B%E9%85%8D%E7%BD%AE%E4%B8%8E%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84/" title="keil项目结构与工程配置">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="vcomments" style="margin:0 30px;"></div><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="//cdn.jsdelivr.net/gh/xcss/valine@latest/dist/Valine.min.js"></script><script>var valine = new Valine({
+  el:'#vcomments',
+  notify:false || false, 
+  verify:false|| false, 
+  app_id:'',
+  app_key:'',
+  placeholder:'念念不忘，必有回响...',
+  path: window.location.pathname,
+  serverURLs: '',
+  visitor:true,
+  recordIP:true,
+  avatar:'mp'
+})</script></div></div></div></div><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script src="/js/baidu-tongji.js"></script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":200,"height":400,"hOffset":5,"vOffset":-38},"mobile":{"show":false,"scale":0.2},"react":{"opacityDefault":0.8,"opacityOnHover":0.2},"log":false});</script></body></html>

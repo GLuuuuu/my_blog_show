@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Core"><title>嵌入式分层设计 · Lumo's blogs</title><meta name="description" content="文件作用（以简单的LED设计为例）
+一、led_desc.h作用：定义LED的硬件描述符结构体
+123456struct led_desc &amp;#123;    GPIO_TypeDef* Port;   // GPIO端口（如 GPIOC）    uint16_t      Pin;    // 引"><meta name="keywords" content="极限博客,极限Blog,博客,极限"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="/images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">Lumo's blogs</a></h3><div class="description"><p>心之所愿，无事不成。<br> Nothing is impossible to a willing heart.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Gluuuuu"><i class="fa fa-github"></i></a></li><li><a href="suus9809@gmail.com"><i class="fa fa-envelope"></i></a></li><li><a target="_blank" rel="noopener" href="http://sighttp.qq.com/authd?IDKEY="><i class="fa fa-qq"></i></a></li><li><a target="_blank" rel="noopener" href="https://zhihu.com/people/"><i class="fa fa-mortar-board"></i></a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2020 </span><i class="fa fa-star"></i><span> Core</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/mrcore/hexo-theme-Anatole-Core" target="_blank">Anatole-Core  </a></div><div class="beian"><a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备15011643号</a><span style="height:10px;margin-left: 10px;">|</span><img src="/images/gongan.png" style="height:10px;margin-left: 10px;position: relative;top: 1px;"><span style="margin-left: 2px;">粤公网安备 44030402003967号</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/tags">标签</a></li><li><a href="/about">关于</a></li><li><a href="/guestbook">留言</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>嵌入式分层设计</a></h3></div><div class="post-content"><h2 id="文件作用（以简单的LED设计为例）"><a href="#文件作用（以简单的LED设计为例）" class="headerlink" title="文件作用（以简单的LED设计为例）"></a>文件作用（以简单的LED设计为例）</h2><hr>
+<h3 id="一、led-desc-h"><a href="#一、led-desc-h" class="headerlink" title="一、led_desc.h"></a>一、led_desc.h</h3><p><strong>作用：定义LED的硬件描述符结构体</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_desc</span> &#123;</span></span><br><span class="line">    GPIO_TypeDef* Port;   <span class="comment">// GPIO端口（如 GPIOC）</span></span><br><span class="line">    <span class="type">uint16_t</span>      Pin;    <span class="comment">// 引脚号（如 GPIO_Pin_13）</span></span><br><span class="line">    BitAction     OnBit;  <span class="comment">// 点亮LED时的电平（Bit_SET 或 Bit_RESET）</span></span><br><span class="line">    BitAction     OffBit; <span class="comment">// 熄灭LED时的电平（Bit_SET 或 Bit_RESET）</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>职责：</strong></p>
+<ul>
+<li>定义LED的硬件映射关系</li>
+<li>把“LED接在哪个引脚、高电平亮还是低电平亮”这些硬件信息打包成一个结构体</li>
+<li><strong>这个文件是唯一直接包含 <code>stm32f10x.h</code> 的头文件</strong></li>
+</ul>
+<p><strong>为什么需要它：</strong><br>让 <code>led.c</code> 能够通过一个结构体指针来操作任意LED，而不是写死某个引脚。</p>
+<hr>
+<h3 id="二、led-h"><a href="#二、led-h" class="headerlink" title="二、led.h"></a>二、led.h</h3><p><strong>作用：对外声明LED的操作接口（API）</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_desc</span>;</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">led_desc</span> *<span class="title">led_desc_t</span>;</span>   <span class="comment">// 不透明指针类型</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">led_init</span><span class="params">(<span class="type">led_desc_t</span> led)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">led_set</span><span class="params">(<span class="type">led_desc_t</span> led, <span class="type">bool</span> status)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">led_on</span><span class="params">(<span class="type">led_desc_t</span> led)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">led_off</span><span class="params">(<span class="type">led_desc_t</span> led)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>职责：</strong></p>
+<ul>
+<li>告诉调用者（如 <code>main.c</code>）“我能提供哪些LED操作”</li>
+<li>定义 <code>led_desc_t</code> 不透明指针类型</li>
+<li><strong>不包含任何硬件相关的头文件</strong></li>
+</ul>
+<p><strong>为什么需要它：</strong></p>
+<ul>
+<li>让 <code>main.c</code> 只需要包含这个文件就能使用LED功能</li>
+<li>通过不透明指针隐藏硬件细节，实现隔离</li>
+</ul>
+<p><strong>关键点：</strong> 这里用了 <code>struct led_desc;</code> 前置声明，但没有包含 <code>led_desc.h</code>，所以调用者不知道结构体里面有什么。</p>
+<hr>
+<h3 id="三、led-c"><a href="#三、led-c" class="headerlink" title="三、led.c"></a>三、led.c</h3><p><strong>作用：实现LED的具体操作逻辑</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">led_init</span><span class="params">(<span class="type">led_desc_t</span> led)</span> &#123;</span><br><span class="line">    <span class="comment">// 使用GPIO_Init初始化引脚</span></span><br><span class="line">    <span class="comment">// 使用GPIO_SetBits默认关闭LED</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">led_on</span><span class="params">(<span class="type">led_desc_t</span> led)</span> &#123;</span><br><span class="line">    GPIO_WriteBit(led-&gt;Port, led-&gt;Pin, led-&gt;OnBit);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">led_off</span><span class="params">(<span class="type">led_desc_t</span> led)</span> &#123;</span><br><span class="line">    GPIO_WriteBit(led-&gt;Port, led-&gt;Pin, led-&gt;OffBit);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>职责：</strong></p>
+<ul>
+<li>实现 <code>led.h</code> 中声明的所有函数</li>
+<li>通过 <code>led_desc_t</code> 指针获取硬件信息（Port、Pin、OnBit、OffBit）</li>
+<li>调用STD库函数（如 <code>GPIO_WriteBit</code>）操作硬件</li>
+<li><strong>包含 <code>led_desc.h</code>，因此知道结构体的完整定义</strong></li>
+</ul>
+<p><strong>为什么需要它：</strong></p>
+<ul>
+<li>把具体怎么操作LED的代码集中在一个地方</li>
+<li>换芯片时只需要重写这个文件（或者其中的GPIO操作部分）</li>
+</ul>
+<p><strong>注意：</strong> 这个文件没有包含 <code>led.h</code>，通常应该包含 <code>led.h</code> 来确保函数声明和定义一致。后续已经加上</p>
+<hr>
+<h3 id="四、board-h"><a href="#四、board-h" class="headerlink" title="四、board.h"></a>四、board.h</h3><p><strong>作用：声明板级资源和初始化函数</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">led_desc_t</span> led1;              <span class="comment">// 声明LED1的描述符指针</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">board_lowlevel_init</span><span class="params">(<span class="type">void</span>)</span>;      <span class="comment">// 声明板级底层初始化</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>职责：</strong></p>
+<ul>
+<li>告诉外部“板子上有哪些可用资源”（如 led1）</li>
+<li>声明板级初始化函数</li>
+<li><strong>不暴露硬件细节</strong>（只是 <code>extern</code> 一个指针，不暴露结构体内容）</li>
+</ul>
+<p><strong>为什么需要它：</strong></p>
+<ul>
+<li><code>main.c</code> 通过它拿到 <code>led1</code> 描述符</li>
+<li>把“板子有什么”和“怎么用”分离开</li>
+</ul>
+<hr>
+<h3 id="五、board-c"><a href="#五、board-c" class="headerlink" title="五、board.c"></a>五、board.c</h3><p><strong>作用：实现板级资源的硬件描述</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">led_desc</span> <span class="title">led1_desc</span> =</span> &#123;GPIOC, GPIO_Pin_13, Bit_RESET, Bit_SET&#125;;</span><br><span class="line"><span class="type">led_desc_t</span> led1 = &amp;led1_desc;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">board_lowlevel_init</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>职责：</strong></p>
+<ul>
+<li>定义具体的LED硬件描述符（板子上LED1接在PC13，低电平亮）</li>
+<li>实现板级初始化（使能GPIOC时钟）</li>
+<li><strong>这是唯一知道“LED1具体接在哪个引脚”的地方</strong></li>
+</ul>
+<p><strong>为什么需要它：</strong></p>
+<ul>
+<li>集中管理板级硬件信息</li>
+<li>换板子时只需要改这个文件</li>
+<li>多个应用共享同一个板子时，只需要一套 <code>board.c</code></li>
+</ul>
+<hr>
+<h3 id="六、main-c"><a href="#六、main-c" class="headerlink" title="六、main.c"></a>六、main.c</h3><p><strong>作用：应用层业务逻辑</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;board.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    board_lowlevel_init();</span><br><span class="line">    led_init(led1);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">        led_on(led1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>职责：</strong></p>
+<ul>
+<li>调用初始化函数</li>
+<li>执行业务逻辑（点亮LED）</li>
+<li><strong>完全不接触硬件寄存器，也不包含 <code>stm32f10x.h</code></strong></li>
+</ul>
+<p><strong>为什么需要它：</strong></p>
+<ul>
+<li>这是你要写的“业务代码”</li>
+<li>换芯片、换板子时，这部分的逻辑完全不用改</li>
+</ul>
+<hr>
+<h2 id="文件依赖关系总览"><a href="#文件依赖关系总览" class="headerlink" title="文件依赖关系总览"></a>文件依赖关系总览</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">    main.c</span><br><span class="line">      │</span><br><span class="line">      │ #include &quot;board.h&quot;</span><br><span class="line">      ▼</span><br><span class="line">   board.h</span><br><span class="line">      │</span><br><span class="line">      │ 声明 led1（extern）</span><br><span class="line">      │ 声明 board_lowlevel_init</span><br><span class="line">      │ #include &quot;led.h&quot;</span><br><span class="line">      ▼</span><br><span class="line">    led.h</span><br><span class="line">      │</span><br><span class="line">      │ 定义 led_desc_t 类型</span><br><span class="line">      │ 声明 led_init、led_on 等函数</span><br><span class="line">      │ 不使用 led_desc 的完整定义（前置声明）</span><br><span class="line">      </span><br><span class="line">              </span><br><span class="line">    led.c                    board.c</span><br><span class="line">      │                         │</span><br><span class="line">      │ #include &quot;led_desc.h&quot;   │ #include &quot;stm32f10x.h&quot;</span><br><span class="line">      │ #include &quot;led.h&quot;        │ #include &quot;led_desc.h&quot;</span><br><span class="line">      │                         │ #include &quot;led.h&quot;</span><br><span class="line">      ▼                         ▼</span><br><span class="line"> led_desc.h                 led_desc.h</span><br><span class="line">      │                         │</span><br><span class="line">      │ #include &quot;stm32f10x.h&quot;  │ #include &quot;stm32f10x.h&quot;</span><br><span class="line">      ▼                         ▼</span><br><span class="line">完整结构体定义              完整结构体定义</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="隔离的核心体现"><a href="#隔离的核心体现" class="headerlink" title="隔离的核心体现"></a>隔离的核心体现</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">main.c 不知道：</span><br><span class="line">- 芯片型号（STM32F103 还是 GD32）</span><br><span class="line">- LED 接在哪个引脚（PC13 还是 PA5）</span><br><span class="line">- 高电平有效还是低电平有效（Bit_SET 还是 Bit_RESET）</span><br><span class="line">- GPIO 时钟怎么使能</span><br><span class="line"></span><br><span class="line">main.c 只知道：</span><br><span class="line">- 调用 board_lowlevel_init() 初始化硬件</span><br><span class="line">- 调用 led_init(led1) 初始化LED</span><br><span class="line">- 调用 led_on(led1) 点亮LED</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li><code>board.c</code> 暴露 <code>led1</code> 是因为 <code>main.c</code> <strong>需要直接使用</strong>这个具体的LED对象。</li>
+<li><code>led.c</code> 不暴露变量，只暴露函数（<code>led_init</code>、<code>led_on</code> 等）。函数本身在 <code>.h</code> 中声明时**不需要 <code>extern</code>**（函数默认就是 <code>extern</code> 的）。</li>
+</ul>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-04-26</span><i class="fa fa-tag"></i><a class="tag" href="/categories/嵌入式/" title="嵌入式">嵌入式 </a><a class="tag" href="/tags/编译与链接/" title="编译与链接">编译与链接 </a><a class="tag" href="/tags/隔离思想/" title="隔离思想">隔离思想 </a><span class="leancloud_visitors"></span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://example.com/2026/04/26/文件分层设计/,Lumo's blogs,嵌入式分层设计,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="/2026/04/25/SWD%E4%B8%8EJTAG/" title="SWD.JTAG">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="vcomments" style="margin:0 30px;"></div><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="//cdn.jsdelivr.net/gh/xcss/valine@latest/dist/Valine.min.js"></script><script>var valine = new Valine({
+  el:'#vcomments',
+  notify:false || false, 
+  verify:false|| false, 
+  app_id:'',
+  app_key:'',
+  placeholder:'念念不忘，必有回响...',
+  path: window.location.pathname,
+  serverURLs: '',
+  visitor:true,
+  recordIP:true,
+  avatar:'mp'
+})</script></div></div></div></div><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script src="/js/baidu-tongji.js"></script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":200,"height":400,"hOffset":5,"vOffset":-38},"mobile":{"show":false,"scale":0.2},"react":{"opacityDefault":0.8,"opacityOnHover":0.2},"log":false});</script></body></html>
