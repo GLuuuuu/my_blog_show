@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Core"><title>回调函数与中断 · Lumo's blogs</title><meta name="description" content="回调函数一、 概念：什么是回调？1. 定义回调函数就是一个通过函数指针调用的函数。如果你函数的指针（地址）作为参数传递给另一个函数，当这个指针被用来调用其所指向的函数时，我们就说这是回调函数。
+2. 类比：外卖员与客户
+普通调用：去餐厅排队买饭，饭没好就一直在那等。
+回调调用：点完外卖，把手机号（函"><meta name="keywords" content="极限博客,极限Blog,博客,极限"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="/images/logo@2x.png" style="width:127px;"><h3 title=""><a href="/">Lumo's blogs</a></h3><div class="description"><p>心之所愿，无事不成。<br> Nothing is impossible to a willing heart.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Gluuuuu"><i class="fa fa-github"></i></a></li><li><a href="suus9809@gmail.com"><i class="fa fa-envelope"></i></a></li><li><a target="_blank" rel="noopener" href="http://sighttp.qq.com/authd?IDKEY="><i class="fa fa-qq"></i></a></li><li><a target="_blank" rel="noopener" href="https://zhihu.com/people/"><i class="fa fa-mortar-board"></i></a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2020 </span><i class="fa fa-star"></i><span> Core</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/mrcore/hexo-theme-Anatole-Core" target="_blank">Anatole-Core  </a></div><div class="beian"><a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备15011643号</a><span style="height:10px;margin-left: 10px;">|</span><img src="/images/gongan.png" style="height:10px;margin-left: 10px;position: relative;top: 1px;"><span style="margin-left: 2px;">粤公网安备 44030402003967号</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/tags">标签</a></li><li><a href="/about">关于</a></li><li><a href="/guestbook">留言</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>回调函数与中断</a></h3></div><div class="post-content"><hr>
+<h1 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h1><h2 id="一、-概念：什么是回调？"><a href="#一、-概念：什么是回调？" class="headerlink" title="一、 概念：什么是回调？"></a>一、 概念：什么是回调？</h2><h3 id="1-定义"><a href="#1-定义" class="headerlink" title="1. 定义"></a>1. 定义</h3><p>回调函数就是一个<strong>通过函数指针调用</strong>的函数。如果你函数的指针（地址）作为参数传递给另一个函数，当这个指针被用来调用其所指向的函数时，我们就说这是回调函数。</p>
+<h3 id="2-类比：外卖员与客户"><a href="#2-类比：外卖员与客户" class="headerlink" title="2. 类比：外卖员与客户"></a>2. 类比：外卖员与客户</h3><ul>
+<li><strong>普通调用</strong>：去餐厅排队买饭，饭没好就一直在那等。</li>
+<li><strong>回调调用</strong>：点完外卖，把<strong>手机号</strong>（函数指针）留给外卖员。然后回家打游戏（<strong>执行主程序</strong>），外卖员送到楼下打通电话（<strong>触发回调</strong>），才下楼取餐（<strong>处理事件</strong>）。</li>
+</ul>
+<hr>
+<h2 id="二、-理解回调代码"><a href="#二、-理解回调代码" class="headerlink" title="二、 理解回调代码"></a>二、 理解回调代码</h2><p>在 C 语言中，实现回调的核心是 <strong>函数指针</strong> 和 **<code>typedef</code>**。</p>
+<h3 id="1-拆解-typedef-定义插座标准"><a href="#1-拆解-typedef-定义插座标准" class="headerlink" title="1. 拆解 typedef (定义插座标准)"></a>1. 拆解 <code>typedef</code> (定义插座标准)</h3><p>回调函数必须有统一的格式。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*Callback_t)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>typedef</code>：起别名。</li>
+<li><code>void</code>：函数没有返回值。</li>
+<li><code>(*Callback_t)</code>：<code>Callback_t</code> 是一个指针类型名称。</li>
+<li><code>(int)</code>：这个函数必须接收一个 <code>int</code> 参数。</li>
+</ul>
+<blockquote>
+<p><strong>总结</strong>：代码定义了一个“插座标准”，只有符合这个参数和返回值的函数才能插进来。</p>
+</blockquote>
+<h3 id="2-注册机制-安装插头"><a href="#2-注册机制-安装插头" class="headerlink" title="2. 注册机制 (安装插头)"></a>2. 注册机制 (安装插头)</h3><p>我们需要一个全局变量来存放这个指针。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Callback_t p_callback = <span class="literal">NULL</span>; <span class="comment">// 墙上的插座</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册函数：把用户写的函数地址存起来</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">Register_Callback</span><span class="params">(Callback_t func)</span> &#123;</span><br><span class="line">    p_callback = func; </span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、-嵌入式中断中的回调"><a href="#三、-嵌入式中断中的回调" class="headerlink" title="三、 嵌入式中断中的回调"></a>三、 嵌入式中断中的回调</h2><p>在 STM32 等嵌入式开发中，回调函数最大的意义在于<strong>解耦</strong>：驱动层（厂商写死）触发中断，应用层（用户编写）决定做什么。</p>
+<h3 id="1-代码结构图解"><a href="#1-代码结构图解" class="headerlink" title="1. 代码结构图解"></a>1. 代码结构图解</h3><table>
+<thead>
+<tr>
+<th>角色</th>
+<th>任务</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>硬件层</strong></td>
+<td>产生物理信号（如按键按下）</td>
+<td>无法修改</td>
+</tr>
+<tr>
+<td><strong>驱动层 (ISR)</strong></td>
+<td>捕获中断，清除标志位，调用回调变量</td>
+<td>厂商提供，不建议改动源码</td>
+</tr>
+<tr>
+<td><strong>应用层</strong></td>
+<td>编写具体的业务逻辑</td>
+<td>用户自定义，灵活多变</td>
+</tr>
+</tbody></table>
+<h3 id="2-完整流程示例"><a href="#2-完整流程示例" class="headerlink" title="2. 完整流程示例"></a>2. 完整流程示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* --- 驱动层 --- */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*Notify_Func)</span><span class="params">(<span class="type">void</span>)</span>; <span class="comment">// 定义标准</span></span><br><span class="line"><span class="type">static</span> Notify_Func g_handler = <span class="literal">NULL</span>; <span class="comment">// 定义插座</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 底层硬中断服务程序</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">EXTI0_IRQHandler</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 1. 硬件相关处理（如清除位）</span></span><br><span class="line">    __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 2. 执行回调（如果用户注册了的话）</span></span><br><span class="line">    <span class="keyword">if</span> (g_handler) &#123;</span><br><span class="line">        g_handler(); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 供用户调用的注册接口</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">Set_Notify_Handler</span><span class="params">(Notify_Func f)</span> &#123;</span><br><span class="line">    g_handler = f;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 应用层 --- */</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">My_Project_Logic</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 具体的业务逻辑</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 将写入的逻辑“插进”底层的中断中，当事务到来时自动触发</span></span><br><span class="line">    Set_Notify_Handler(My_Project_Logic); </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// 主循环做别的事</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>注意：存放函数指针的全局变量需被static修饰，原因如下（以timer定时器为例）：</p>
+<h6 id="1-限制作用域（文件私有）"><a href="#1-限制作用域（文件私有）" class="headerlink" title="1. 限制作用域（文件私有）"></a>1. <strong>限制作用域（文件私有）</strong></h6><p><code>static</code> 让这个变量<strong>仅在当前 <code>.c</code> 文件内可见</strong>，其他 <code>.c</code> 文件无法访问。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// timer.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">timer_elapsed_callback_t</span> timer_elapsed_callback;  <span class="comment">// 只有timer.c能访问</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// main.c 或其他文件</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">timer_elapsed_callback_t</span> timer_elapsed_callback;  <span class="comment">// ❌ 编译错误！</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="2-封装性"><a href="#2-封装性" class="headerlink" title="2. 封装性"></a>2. <strong>封装性</strong></h6><p>回调函数指针是定时器模块的<strong>内部状态</strong>，外部不应该直接修改，只能通过提供的接口函数修改：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对外暴露的接口</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">timer_elapsed_register</span><span class="params">(<span class="type">timer_elapsed_callback_t</span> callback)</span></span><br><span class="line">&#123;</span><br><span class="line">    timer_elapsed_callback = callback;  <span class="comment">// 唯一修改入口</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果没有static，外部可以直接赋值：</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">timer_elapsed_callback_t</span> timer_elapsed_callback;</span><br><span class="line">timer_elapsed_callback = my_func;  <span class="comment">// ⚠️ 绕过接口，破坏封装</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="3-避免命名冲突"><a href="#3-避免命名冲突" class="headerlink" title="3. 避免命名冲突"></a>3. <strong>避免命名冲突</strong></h6><p>大型项目中，多个文件可能有类似命名的全局变量。<code>static</code> 让每个文件的同名变量互不干扰：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// timer.c</span></span><br><span class="line"><span class="type">static</span> <span class="title function_">void</span> <span class="params">(*callback)</span><span class="params">(<span class="type">void</span>)</span>;  <span class="comment">// timer自己的</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// uart.c  </span></span><br><span class="line"><span class="type">static</span> <span class="title function_">void</span> <span class="params">(*callback)</span><span class="params">(<span class="type">void</span>)</span>;  <span class="comment">// uart自己的，不会冲突</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>✅ 外部只需要知道”能注册回调”（调用 <code>timer_elapsed_register</code>）</li>
+<li>❌ 外部不需要知道”回调存在哪里”（变量地址）</li>
+</ul>
+<hr>
+<p><strong>总结</strong>：<code>static</code> 在这里是为了<strong>封装</strong>和<strong>避免符号冲突</strong>，让回调指针成为模块私有的内部状态，外部只能通过提供的友好接口来操作。</p>
+<h2 id="四、-为什么一定要用回调？"><a href="#四、-为什么一定要用回调？" class="headerlink" title="四、 为什么一定要用回调？"></a>四、 为什么一定要用回调？</h2><ol>
+<li><strong>分层思想</strong>：底层驱动代码（<code>.c</code>文件）不需要知道上层逻辑。今天想点灯，明天想发串口消息，只需要改示例里的<code>main.c</code> 里的回调函数，而不需要去动 <code>Driver.c</code>。</li>
+<li><strong>多处复用</strong>：同一个定时器中断，在项目 A 里用来扫描按键，在项目 B 里用来计算 PID，只需注册不同的回调函数即可。</li>
+<li><strong>防止源码污染</strong>：当你使用第三方库（如 RTOS、网络协议栈）时，你无法修改库的源码，只能通过回调接口传入你的逻辑。</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>总结</strong><br>回调函数就是<strong>底层留下的“空位”</strong>，你把<strong>函数的地址</strong>填进去，当特定事件发生时，底层就会根据地址找到并执行你的代码。</p>
+</blockquote>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-04-29</span><i class="fa fa-tag"></i><a class="tag" href="/categories/嵌入式/" title="嵌入式">嵌入式 </a><a class="tag" href="/tags/函数指针/" title="函数指针">函数指针 </a><span class="leancloud_visitors"></span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/home?status=,http://example.com/2026/04/29/回调函数与中断/,Lumo's blogs,回调函数与中断,;"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2026/04/30/%E5%B8%B8%E8%A7%81%E4%BB%A3%E7%A0%81%E8%AF%AD%E6%B3%95/" title="常见代码语法">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/2026/04/26/%E6%96%87%E4%BB%B6%E5%88%86%E5%B1%82%E8%AE%BE%E8%AE%A1/" title="嵌入式分层设计">下一篇</a></li></ul></div><script src="/js/visitors.js"></script><a id="comments"></a><div id="vcomments" style="margin:0 30px;"></div><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="//cdn.jsdelivr.net/gh/xcss/valine@latest/dist/Valine.min.js"></script><script>var valine = new Valine({
+  el:'#vcomments',
+  notify:false || false, 
+  verify:false|| false, 
+  app_id:'',
+  app_key:'',
+  placeholder:'念念不忘，必有回响...',
+  path: window.location.pathname,
+  serverURLs: '',
+  visitor:true,
+  recordIP:true,
+  avatar:'mp'
+})</script></div></div></div></div><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script src="/js/baidu-tongji.js"></script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":200,"height":400,"hOffset":5,"vOffset":-38},"mobile":{"show":false,"scale":0.2},"react":{"opacityDefault":0.8,"opacityOnHover":0.2},"log":false});</script></body></html>
